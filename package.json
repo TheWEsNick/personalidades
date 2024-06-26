@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "glob": "^10.4.2",
+    "rimraf": "^5.0.7",
+    "sails-postgresql": "^5.0.1"
+  }
+}
