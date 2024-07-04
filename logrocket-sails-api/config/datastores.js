@@ -49,7 +49,7 @@ module.exports.datastores = {
     *                                                                          *
     ***************************************************************************/
     adapter: 'sails-postgresql',
-    url: 'postgres://logrocket_sails_api:logrocketsailsapi@localhost:5432/logrocket_sails_api', // Replace with your own connection URL
+    url: 'postgres://docker:docker@localhost:5432/personalidades', // Replace with your own connection URL
 
   },
 

@@ -7,6 +7,6 @@ module.exports = {
   },
   fn: async function (_, exits) {
     // All done.
-    exits.success({message: 'LogRocket Sails API'});
+    exits.success({message: 'executado com sucesso'});
   }
 };
