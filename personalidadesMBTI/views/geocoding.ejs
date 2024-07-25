@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Geocoding</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    #map {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+    }
+  </style>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+  <h1>Geocoding</h1>
+  <form id="geocodingForm">
+    <input type="text" id="inputField" placeholder="Digite um CEP ou endereço">
+    <button type="submit">Verificar</button>
+  </form>
+  <div id="result"></div>
+  <div id="map"></div>
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js'></script>
+  <script>
+    document.getElementById('geocodingForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const input = document.getElementById('inputField').value;
+
+      fetch('/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input: input })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const resultDiv = document.getElementById('result');
+        if (data.type === 'cep') {
+          resultDiv.innerHTML = `
+            <p><strong>CEP:</strong> ${input}</p>
+            <p><strong>UF:</strong> ${data.uf}</p>
+            <p><strong>Localidade:</strong> ${data.localidade}</p>
+            <p><strong>Bairro:</strong> ${data.bairro}</p>
+            <p><strong>Longitude:</strong> ${data.coordinates.longitude}</p>
+            <p><strong>Latitude:</strong> ${data.coordinates.latitude}</p>
+          `;
+
+          // Integrar o mapa do Mapbox
+          mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
+          const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [data.coordinates.longitude, data.coordinates.latitude],
+            zoom: 14
+          });
+
+          new mapboxgl.Marker()
+            .setLngLat([data.coordinates.longitude, data.coordinates.latitude])
+            .addTo(map);
+        } else if (data.type === 'endereco') {
+          resultDiv.textContent = `Endereço detectado: ${data.value}`;
+        } else if (data.error) {
+          resultDiv.textContent = `Erro: ${data.error}`;
+        }
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+      });
+    });
+  </script>
+</body>
+</html>

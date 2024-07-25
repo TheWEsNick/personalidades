@@ -12,3 +12,8 @@ module.exports.routes = {
     "GET /": "home/index"
 
 };
+
+module.exports.routes = {
+    'POST /verify': 'GeocodingController.verifyInput'
+  };
+  
