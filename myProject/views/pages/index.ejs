@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NAVISTA</title>
+  <link rel="icon" href="logo1Navista.png" type="image/x-icon">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Oculta a barra de rolagem */
+    }
+    .search-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 1; /* Garante que o popup fique sobre o mapa */
+    }
+    .search-container input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 300px; /* Largura fixa para o campo de entrada */
+    }
+    .search-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2a6a7c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .search-container button:hover {
+      background-color: #1d4955;
+    }
+    #map {
+      width: 100vw; /* Ocupa toda a largura da tela */
+      height: 100vh; /* Ocupa toda a altura da tela */
+    }
+  </style>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+  <div class="search-container">
+    <img src="logo1Navista.png">
+    <form id="geocodingForm">
+      <input type="text" id="inputField" placeholder="Digite um CEP ou endereço">
+      <button type="submit">Buscar</button>
+    </form>
+  </div>
+  <div id="map"></div>
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js'></script>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-74.5, 40], // Coordenadas iniciais
+      zoom: 9
+    });
+
+    document.getElementById('geocodingForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const input = document.getElementById('inputField').value;
+
+      fetch('/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input: input })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const resultDiv = document.getElementById('result');
+        if (data.type === 'cep') {
+          resultDiv.innerHTML = `
+            <p><strong>CEP:</strong> ${input}</p>
+            <p><strong>UF:</strong> ${data.uf}</p>
+            <p><strong>Localidade:</strong> ${data.localidade}</p>
+            <p><strong>Bairro:</strong> ${data.bairro}</p>
+            <p><strong>Longitude:</strong> ${data.coordinates.longitude}</p>
+            <p><strong>Latitude:</strong> ${data.coordinates.latitude}</p>
+          `;
+
+          // Integrar o mapa do Mapbox
+          mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
+          const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [data.coordinates.longitude, data.coordinates.latitude],
+            zoom: 14
+          });
+
+          new mapboxgl.Marker()
+            .setLngLat([data.coordinates.longitude, data.coordinates.latitude])
+            .addTo(map);
+        } else if (data.type === 'endereco') {
+          resultDiv.textContent = `Endereço detectado: ${data.value}`;
+        } else if (data.error) {
+          resultDiv.textContent = `Erro: ${data.error}`;
+        }
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+      });
+    });
+
+    </script>
+</body>
+</html>
