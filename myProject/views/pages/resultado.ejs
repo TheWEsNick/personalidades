@@ -1,118 +1,33 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado</title>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f9f9f9;
-        }
-        .search-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .search-container img {
-            display: block;
-            margin: 0 auto 20px;
-        }
-        .search-container input[type="text"] {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        .search-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #ccc;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-        #map {
-            width: 300px;
-            height: 300px;
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-    </style>
+  <title>Resultado da Geocodificação</title>
+  <style>
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body>
-    <div class="search-container">
-        <img src="logo1Navista.png" alt="Logo">
-        <form id="geocodingForm">
-            <input type="text" id="inputField" placeholder="Digite um CEP ou endereço">
-            <button type="submit">Buscar</button>
-        </form>
-    </div>
-    <div id="result">
-        Cidade: <span id="cidade">Dados não disponíveis</span><br>
-        Bairro: <span id="bairro">Dados não disponíveis</span><br>
-        IBGE: <span id="ibge">Dados não disponíveis</span>
-    </div>
-    <div id="map"></div>
-    
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
-    <script>
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [-55.0, -15.0], // Coordenadas iniciais
-            zoom: 2.2
-        });
+  <div id="map"></div>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js'></script>
+  <script>
+    const longitude = '<%= longitude %>';
+    const latitude = '<%= latitude %>';
 
-        document.getElementById('geocodingForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const input = document.getElementById('inputField').value;
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [longitude, latitude], // Coordenadas da localização encontrada
+      zoom: 14
+    });
 
-            fetch('/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ input: input })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById('result');
-                if (data.type === 'cep') {
-                    document.getElementById("cidade").textContent = data.localidade || "Dados não disponíveis";
-                    document.getElementById("bairro").textContent = data.bairro || "Dados não disponíveis";
-                    document.getElementById("ibge").textContent = data.ibge || "Dados não disponíveis";
-
-                    map.setCenter([data.coordinates.longitude, data.coordinates.latitude]);
-                    map.setZoom(14);
-
-                    new mapboxgl.Marker()
-                        .setLngLat([data.coordinates.longitude, data.coordinates.latitude])
-                        .addTo(map);
-                } else if (data.type === 'endereco') {
-                    resultDiv.textContent = `Endereço detectado: ${data.value}`;
-                } else if (data.error) {
-                    resultDiv.textContent = `Erro: ${data.error}`;
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-            });
-        });
-    </script>
+    new mapboxgl.Marker()
+      .setLngLat([longitude, latitude])
+      .addTo(map);
+  </script>
 </body>
 </html>

@@ -43,15 +43,23 @@
       width: 100vw; /* Ocupa toda a largura da tela */
       height: 100vh; /* Ocupa toda a altura da tela */
     }
+    img {
+      padding: 0;
+      margin: 0;
+    }
   </style>
   <link href='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body>
   <div class="search-container">
-    <img src="https://i.pinimg.com/736x/0e/56/d9/0e56d922cfbf2122cba1967faf3364d2.jpg"  width=60 height=55>      
-    <input type="text" id="inputField" placeholder="Digite um CEP ou endereço">
+    <img src="https://i.pinimg.com/736x/0c/69/e8/0c69e8197ae956eef58aee2509891e2c.jpg" width=100 height=100>      
+    <form id="geocodingForm" method="post" action="/search">
+      <input type="text" id="inputField" name="input" placeholder="Digite um CEP ou endereço">
       <button type="submit">Buscar</button>
     </form>
+    <% if (error) { %>
+      <p style="color: red;"><%= error %></p>
+    <% } %>
   </div>
   <div id="map"></div>
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js'></script>
@@ -63,54 +71,6 @@
       center: [-55.0, -15.0], // Coordenadas iniciais
       zoom: 4
     });
-
-    document.getElementById('geocodingForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const input = document.getElementById('inputField').value;
-
-      fetch('/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },                                                                                                                                                   
-        body: JSON.stringify({ input: input })
-      })
-      .then(response => response.json())
-      .then(data => {
-        const resultDiv = document.getElementById('result');
-        if (data.type === 'cep') {
-          resultDiv.innerHTML = `
-            <p><strong>CEP:</strong> ${input}</p>
-            <p><strong>UF:</strong> ${data.uf}</p>
-            <p><strong>Localidade:</strong> ${data.localidade}</p>
-            <p><strong>Bairro:</strong> ${data.bairro}</p>
-            <p><strong>Longitude:</strong> ${data.coordinates.longitude}</p>
-            <p><strong>Latitude:</strong> ${data.coordinates.latitude}</p>
-          `;
-
-          // Integrar o mapa do Mapbox
-          mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hbmRpdGEiLCJhIjoiY2x5eWJzdGl4MGhmYzJrcHJuYnY1ZTM3aCJ9.IsaeTvf1a7HSHMV2i3obQQ';
-          const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [data.coordinates.longitude, data.coordinates.latitude],
-            zoom: 14
-          });
-
-          new mapboxgl.Marker()
-            .setLngLat([data.coordinates.longitude, data.coordinates.latitude])
-            .addTo(map);
-        } else if (data.type === 'endereco') {
-          resultDiv.textContent = `Endereço detectado: ${data.value}`;
-        } else if (data.error) {
-          resultDiv.textContent = `Erro: ${data.error}`;
-        }
-      })
-      .catch(error => {
-        console.error('Erro:', error);
-      });
-    });
-
-    </script>
+  </script>
 </body>
 </html>
