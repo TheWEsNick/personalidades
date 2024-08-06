@@ -7,7 +7,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Oculta a barra de rolagem */
+      overflow: hidden; 
     }
     .search-container {
       position: absolute;
@@ -17,14 +17,14 @@
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      z-index: 1; /* Garante que o popup fique sobre o mapa */
+      z-index: 1; 
     }
     .search-container input[type="text"] {
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 4px; 
-      width: 300px; /* Largura fixa para o campo de entrada */
+      width: 300px; 
     }
     .search-container button {
       padding: 10px 20px;
@@ -40,8 +40,8 @@
       background-color: #1d4955;
     }
     #map {
-      width: 100vw; /* Ocupa toda a largura da tela */
-      height: 100vh; /* Ocupa toda a altura da tela */
+      width: 100vw; 
+      height: 100vh; 
     }
     img {
       padding: 0;
@@ -68,7 +68,7 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-55.0, -15.0], // Coordenadas iniciais
+      center: [-55.0, -15.0], // Coordenadas iniciais do mapa
       zoom: 4
     });
   </script>
