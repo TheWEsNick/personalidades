@@ -1,4 +1,9 @@
 module.exports.routes = {
-  'GET /index': { view: 'pages/index' },
+  'GET / ': { view: 'pages/index' },
+  'GET /resultado ': { view: 'pages/resultado' },
+  'GET /': 'MapController.index',
+  'POST /search': 'MapController.search'
+
+
 
 };
