@@ -5,7 +5,7 @@ const geocodingClient = mbxGeocoding({ accessToken: token });
 
 module.exports = {
   index: function(req, res) {
-    return res.view('index');
+    return res.view('index', { error: null });
   },
 
   search: async function(req, res) {
@@ -15,8 +15,10 @@ module.exports = {
     try {
       if (/^\d{8}$/.test(input)) { // Verifica se é um CEP de 8 dígitos
         locationData = await searchByCEP(input);
+        console.log("É CEP")
       } else if (/[a-zA-Z]/.test(input)) { // Verifica se contém letras, indicando um endereço
         locationData = await searchByAddress(input);
+        console.log("É endereço")
       } else {
         return res.view('index', { error: 'Entrada inválida. Por favor, insira um CEP ou um endereço válido.' });
       }
@@ -25,9 +27,10 @@ module.exports = {
         return res.view('index', { error: 'Localização não encontrada.' });
       }
 
-      return res.view('map', {
+      return res.view('pages/resultado', {
         longitude: locationData.longitude,
-        latitude: locationData.latitude
+        latitude: locationData.latitude,
+        error: null // Passando null explicitamente
       });
     } catch (error) {
       return res.view('index', { error: error.message });
